@@ -1,5 +1,5 @@
-use bootloader_boot_config::LevelFilter;
 use bootloader::BootConfig;
+use bootloader_boot_config::LevelFilter;
 use std::path::PathBuf;
 
 fn main() {

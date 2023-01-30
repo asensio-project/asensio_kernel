@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-use kernel::hlt_loop;
 use bootloader_api::{config::BootloaderConfig, entry_point, BootInfo};
+use kernel::hlt_loop;
 
 pub static BOOTLOADER_CONFIG: BootloaderConfig = BootloaderConfig::new_default();
 
