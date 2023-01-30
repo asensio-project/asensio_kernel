@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+use kernel::hlt_loop;
 use bootloader_api::{config::BootloaderConfig, entry_point, BootInfo};
 
 pub static BOOTLOADER_CONFIG: BootloaderConfig = BootloaderConfig::new_default();
@@ -9,10 +10,10 @@ pub static BOOTLOADER_CONFIG: BootloaderConfig = BootloaderConfig::new_default()
 entry_point!(kmain, config = &BOOTLOADER_CONFIG);
 
 fn kmain(_boot_info: &'static mut BootInfo) -> ! {
-    loop {}
+    hlt_loop();
 }
 
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
-    loop {}
+    hlt_loop();
 }
