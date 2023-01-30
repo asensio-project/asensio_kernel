@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "30 13 * * *" # every day at 13:30
+
+# This causes PR pushes to cancel previous builds, but does not impact cron jobs due to use of .ref, which will have the commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo --version --verbose
+      - uses: Swatinem/rust-cache@v2
+      - uses: r7kamura/rust-problem-matchers@v1.1.0
+      - name: "Run `cargo check`"
+        run: cargo check --all-targets --all
+        
+  fmt:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r7kamura/rust-problem-matchers@v1.1.0
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo --version --verbose
+      - uses: Swatinem/rust-cache@v2
+      - uses: r7kamura/rust-problem-matchers@v1.1.0
+      - run: cargo clippy --all --all-targets
+
+  semver-checks:
+    name: Semver Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "semver-checks"
+          cache-targets: false
+      - run: cargo install cargo-semver-checks --locked
+      - name: Check semver
+        run: cargo semver-checks check-release
+
+  typos:
+      name: Check spelling
+      runs-on: ubuntu-latest
+      steps:
+        - uses: crate-ci/typos@v1.0.4
